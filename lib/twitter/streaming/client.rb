@@ -22,6 +22,7 @@ module Twitter
       # @option options [String] :ssl_socket_class A class that Connection will use to create a new SSL socket.
       # @return [Twitter::Streaming::Client]
       def initialize(options = {})
+        options[:gzip_request] = true
         @parser = options.delete(:parser) || Streaming::MessageParser.new(self)
         super
         @connection = Streaming::Connection.new(options)

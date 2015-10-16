@@ -52,4 +52,18 @@ describe Twitter::Headers do
       expect(authorization).to eq('Basic Q0s6Q1M=')
     end
   end
+
+  describe '#accept_encoding_header' do
+    it 'defaults to no accept encoding header' do
+      client = Twitter::REST::Client.new(bearer_token: 'BT')
+      headers = Twitter::Headers.new(client, :get, Twitter::REST::Client::BASE_URL + '/path')
+      expect(headers.request_headers[:accept_encoding]).to be_nil
+    end
+
+    it 'adds an accept encoding header when option is specified' do
+      client = Twitter::REST::Client.new(bearer_token: 'BT')
+      headers = Twitter::Headers.new(client, :get, Twitter::REST::Client::BASE_URL + '/path', {:gzip_request => true})
+      expect(headers.request_headers[:accept_encoding]).to eq "deflate, gzip"
+    end
+  end
 end

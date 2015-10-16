@@ -9,11 +9,16 @@ module Twitter
       @request_method = request_method.to_sym
       @uri = Addressable::URI.parse(url)
       @bearer_token_request = options.delete(:bearer_token_request)
+      @gzip_request = options.delete(:gzip_request)
       @options = options
     end
 
     def bearer_token_request?
       !!@bearer_token_request
+    end
+
+    def gzip_request?
+      !!@gzip_request
     end
 
     def oauth_auth_header
@@ -23,6 +28,11 @@ module Twitter
     def request_headers
       headers = {}
       headers[:user_agent] = @client.user_agent
+
+      if gzip_request?
+        headers[:accept_encoding] = accept_encoding_header
+      end
+
       if bearer_token_request?
         headers[:accept]        = '*/*'
         headers[:authorization] = bearer_token_credentials_auth_header
@@ -53,6 +63,10 @@ module Twitter
     # @return [String]
     def bearer_token_credentials_auth_header
       "Basic #{Base64.strict_encode64("#{@client.consumer_key}:#{@client.consumer_secret}")}"
+    end
+
+    def accept_encoding_header
+      "deflate, gzip"
     end
 
     # @return [Hash]
